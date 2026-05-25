@@ -14,10 +14,10 @@ BCCH_BASE_URL = "https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx"
 # Códigos de series del Banco Central
 # Puedes encontrar más en: https://si.bcentral.cl/siete/
 BCCH_SERIES = {
-    "ipc_variacion_mensual": "F073.IPC.IND.Z.Z.EP18.Z.N.M",   # IPC variación mensual
-    "uf_diario":             "F073.TCO.PRE.Z.Z.EP17.TUF.N.D", # UF valor diario
-    "dolar_observado":       "F073.TCO.PRE.Z.Z.EP17.TDO.N.D", # Dólar observado
-    "imacec_mensual":        "F032.IMC.IND.Z.Z.EP.Z.Z.M",     # IMACEC mensual
+    "ipc_variacion_mensual": "F073.IPC.IND.Z.Z.EP18.Z.N.M",   # Nota: Este es un Índice (IND). Si quieres la variación en %, revisa tu CSV o script.
+    "uf_diario":             "F073.UFF.PRE.Z.D",              # UF valor diario (Código oficial corregido)
+    "dolar_observado":       "F073.TCO.PRE.Z.D",              # Dólar observado (Código oficial corregido)
+    "imacec_mensual":        "F032.IMC.IND.Z.Z.EP18.Z.Z.0.M", # IMACEC mensual base 2018 (Confirmado en tu CSV)
 }
 
 # --- INE (desempleo) ---
@@ -28,7 +28,7 @@ INE_DESEMPLEO_URL = (
 )
 
 # --- Google Cloud Platform ---
-GCP_PROJECT_ID  = os.getenv("GCP_PROJECT_ID", "indicadores-chile")  # Tu project ID en GCP
+GCP_PROJECT_ID  = os.getenv("GCP_PROJECT_ID", "indicadores-chile-497405")  # Tu project ID en GCP
 GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME", "indicadores-raw")   # Nombre del bucket GCS
 BQ_DATASET      = "indicadores_economicos"                           # Dataset en BigQuery
 

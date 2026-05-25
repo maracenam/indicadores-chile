@@ -7,12 +7,17 @@
 
 import logging
 import sys
+import os
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
 from extraction.bcch_extractor import extract_all_series
 from transformation.transformer import transform_all
 from loading.bq_loader import load_all
 from config.settings import DATE_START
+
+load_dotenv()
+
 
 logging.basicConfig(
     level=logging.INFO,

@@ -5,10 +5,14 @@
 
 import requests
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 import sys
 import os
+
+# Cargar variables de entorno (importante para cuando se corre este archivo solo)
+from dotenv import load_dotenv
+load_dotenv()
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.settings import BCCH_USER, BCCH_PASSWORD, BCCH_BASE_URL, BCCH_SERIES
@@ -22,12 +26,12 @@ def fetch_series(series_id: str, date_start: str, date_end: str) -> pd.DataFrame
     Descarga una serie del Banco Central de Chile.
 
     Args:
-        series_id:   Código de la serie (ej: 'F073.IPC.IND...')
-        date_start:  Fecha inicio en formato 'YYYY-MM-DD'
-        date_end:    Fecha fin   en formato 'YYYY-MM-DD'
+        series_id:  Código de la serie (ej: 'F073.IPC.IND...')
+        date_start: Fecha inicio en formato 'YYYY-MM-DD'
+        date_end:   Fecha fin   en formato 'YYYY-MM-DD'
 
     Returns:
-        DataFrame con columnas ['fecha', 'valor', 'serie_id']
+        DataFrame con columnas ['fecha', 'valor', 'serie_id', 'descargado_en']
     """
     params = {
         "user":          BCCH_USER,
@@ -47,8 +51,17 @@ def fetch_series(series_id: str, date_start: str, date_end: str) -> pd.DataFrame
         response.raise_for_status()
         data = response.json()
 
-        # La API retorna los datos dentro de 'Series' > 'Obs'
+        # Validación 1: Verificar si el BCCH devolvió un error (ej: código incorrecto o error de clave)
+        if "Series" not in data or "Obs" not in data.get("Series", {}):
+            logger.error(f"Respuesta inesperada del BCCH para {series_id}. El banco respondió: {data}")
+            raise ValueError("El Banco Central no devolvió los datos esperados.")
+
         obs = data["Series"]["Obs"]
+        
+        # Validación 2: Verificar si la serie existe pero no tiene datos en esa fecha
+        if not obs:
+            logger.warning(f"No hay datos publicados para {series_id} en este rango de fechas.")
+            return pd.DataFrame()
 
         df = pd.DataFrame(obs)
         df = df.rename(columns={"indexDateString": "fecha", "value": "valor"})
@@ -57,7 +70,7 @@ def fetch_series(series_id: str, date_start: str, date_end: str) -> pd.DataFrame
         df["fecha"]    = pd.to_datetime(df["fecha"], format="%d-%m-%Y", errors="coerce")
         df["valor"]    = pd.to_numeric(df["valor"].str.replace(",", "."), errors="coerce")
         df["serie_id"] = series_id
-        df["descargado_en"] = datetime.utcnow()
+        df["descargado_en"] = datetime.now(timezone.utc) # Actualizado para evitar DeprecationWarning
 
         # Eliminar filas sin valor
         df = df.dropna(subset=["fecha", "valor"])
@@ -67,10 +80,10 @@ def fetch_series(series_id: str, date_start: str, date_end: str) -> pd.DataFrame
         return df
 
     except requests.exceptions.RequestException as e:
-        logger.error(f"Error de red al descargar {series_id}: {e}")
+        logger.error(f"Error de red al conectar con el banco para {series_id}: {e}")
         raise
-    except (KeyError, ValueError) as e:
-        logger.error(f"Error parseando respuesta de {series_id}: {e}")
+    except Exception as e:
+        logger.error(f"Error procesando la serie {series_id}: {e}")
         raise
 
 
@@ -86,11 +99,12 @@ def extract_all_series(date_start: str, date_end: str) -> dict[str, pd.DataFrame
     for nombre, serie_id in BCCH_SERIES.items():
         try:
             df = fetch_series(serie_id, date_start, date_end)
-            df["indicador"] = nombre  # Columna legible con el nombre del indicador
-            resultados[nombre] = df
-            logger.info(f"✓ {nombre} descargado correctamente")
+            if not df.empty:
+                df["indicador"] = nombre  # Columna legible con el nombre del indicador
+                resultados[nombre] = df
+                logger.info(f"✓ {nombre} descargado correctamente")
         except Exception as e:
-            logger.warning(f"✗ {nombre} falló: {e} — continuando con el resto")
+            logger.warning(f"✗ {nombre} falló — continuando con el resto")
 
     return resultados
 

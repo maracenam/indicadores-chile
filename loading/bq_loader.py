@@ -159,7 +159,7 @@ def load_to_bigquery(df: pd.DataFrame, table_name: str, client: bigquery.Client)
 
     # Convertir columna fecha a string para compatibilidad
     df_new = df_new.copy()
-    df_new["fecha"] = df_new["fecha"].dt.strftime("%Y-%m-%d")
+    df_new["fecha"] = pd.to_datetime(df_new["fecha"])
 
     job = client.load_table_from_dataframe(df_new, table_id, job_config=job_config)
     job.result()  # Esperar que termine

@@ -35,7 +35,7 @@ def run_pipeline(date_start: str = None, date_end: str = None):
         date_start: Fecha inicio (default: DATE_START en settings)
         date_end:   Fecha fin    (default: hoy)
     """
-    start_time = datetime.utcnow()
+    start_time = datetime.now(datetime.UTC)
 
     # Si no se pasan fechas, usar configuración por defecto
     if not date_start:
@@ -84,7 +84,7 @@ def run_pipeline(date_start: str = None, date_end: str = None):
     # -------------------------------------------------------
     # RESUMEN
     # -------------------------------------------------------
-    elapsed = (datetime.utcnow() - start_time).seconds
+    elapsed = (datetime.now(datetime.UTC) - start_time).seconds
     logger.info("\n" + "=" * 60)
     logger.info(f"✓ PIPELINE COMPLETADO en {elapsed} segundos")
     for nombre, df in transformed_data.items():

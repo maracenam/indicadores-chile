@@ -7,3 +7,5 @@ __pycache__/
 *.egg-info/
 dist/
 .DS_Store
+indicadores-chile-497405-39b60d2792a5.json
+*.json

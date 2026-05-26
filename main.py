@@ -115,4 +115,4 @@ if __name__ == "__main__":
     fecha_fin   = datetime.today().strftime("%Y-%m-%d")
     fecha_inicio = (datetime.today() - timedelta(days=90)).strftime("%Y-%m-%d")
 
-    run_pipeline(date_start=fecha_inicio, date_end=fecha_fin)
+    run_pipeline(date_start="2020-01-01", date_end=datetime.today().strftime("%Y-%m-%d"))

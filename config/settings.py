@@ -14,7 +14,7 @@ BCCH_BASE_URL = "https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx"
 # Códigos de series del Banco Central
 # Puedes encontrar más en: https://si.bcentral.cl/siete/
 BCCH_SERIES = {
-    "ipc_variacion_mensual": "F073.IPC.IND.Z.Z.EP18.Z.N.M",   # Nota: Este es un Índice (IND). Si quieres la variación en %, revisa tu CSV o script.
+    "ipc_variacion_mensual": "G073.IPC.IND.2018.M",   # Nota: Este es un Índice (IND). Si quieres la variación en %, revisa tu CSV o script.
     "uf_diario":             "F073.UFF.PRE.Z.D",              # UF valor diario (Código oficial corregido)
     "dolar_observado":       "F073.TCO.PRE.Z.D",              # Dólar observado (Código oficial corregido)
     "imacec_mensual":        "F032.IMC.IND.Z.Z.EP18.Z.Z.0.M", # IMACEC mensual base 2018 (Confirmado en tu CSV)

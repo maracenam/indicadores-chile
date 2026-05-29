@@ -213,7 +213,7 @@ RETURN DIVIDE(dolar_actual - dolar_anterior, dolar_anterior) * 100
 
 ---
 
-## 🗺️ Próximos pasos
+## 🗺️ Próximas actuilizaciones
 
 - [ ] Agregar IPC (índice de precios al consumidor)
 - [ ] Tests unitarios con `pytest` para las funciones de transformación
